@@ -81,10 +81,7 @@ export default function Home() {
                     <CalendarDatePicker
                       date={field.value}
                       onDateSelect={({ from, to }) => {
-                        form.setValue("calendar", {
-                          from: from || new Date(),
-                          to: to || new Date(),
-                        });
+                        form.setValue("calendar", { from, to });
                       }}
                     />
                   </FormControl>

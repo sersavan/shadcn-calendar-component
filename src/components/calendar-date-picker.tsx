@@ -1,3 +1,5 @@
+// src/components/calendar-date-picker.tsx
+
 "use client";
 
 import * as React from "react";
@@ -31,7 +33,7 @@ export function CalendarDatePicker({
   onDateSelect,
 }: React.HTMLAttributes<HTMLDivElement> & {
   date: DateRange;
-  onDateSelect: (range: DateRange) => void;
+  onDateSelect: (range: { from: Date; to: Date }) => void;
 }) {
   const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
   const [selectedRange, setSelectedRange] = React.useState<string | null>(
@@ -54,7 +56,7 @@ export function CalendarDatePicker({
   const handleDateSelect = (range: DateRange | undefined) => {
     if (range) {
       const from = startOfDay(range.from as Date);
-      const to = range.to ? endOfDay(range.to) : undefined;
+      const to = range.to ? endOfDay(range.to) : from;
       onDateSelect({ from, to });
       setMonth(to || from);
     }
