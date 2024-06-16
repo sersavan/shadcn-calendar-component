@@ -52,7 +52,7 @@ export default function Home() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-start space-y-3 p-3">
+    <main className="flex min-h-screen flex-col items-center justify-start space-y-3">
       <PageHeader>
         <PageHeaderHeading>Calendar date picker component</PageHeaderHeading>
         <PageHeaderDescription>assembled with shadcn/ui</PageHeaderDescription>

@@ -1,5 +1,3 @@
-// src/components/calendar-date-picker.tsx
-
 "use client";
 
 import * as React from "react";
