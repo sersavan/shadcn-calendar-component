@@ -40,7 +40,6 @@ export function CalendarDatePicker({
     "This Year"
   );
   const [month, setMonth] = React.useState<Date | undefined>(date?.from);
-  const [manualMonthChange, setManualMonthChange] = React.useState(false);
 
   const handleClose = () => setIsPopoverOpen(false);
   const handleTogglePopover = () => setIsPopoverOpen((prev) => !prev);
@@ -51,7 +50,6 @@ export function CalendarDatePicker({
     onDateSelect({ from: startDate, to: endDate });
     setSelectedRange(range);
     setMonth(from);
-    setManualMonthChange(false);
     closeOnSelect && setIsPopoverOpen(false);
   };
 
@@ -60,16 +58,8 @@ export function CalendarDatePicker({
       const from = startOfDay(range.from as Date);
       const to = range.to ? endOfDay(range.to) : from;
       onDateSelect({ from, to });
-      if (!manualMonthChange) {
-        setMonth(to || from);
-      }
     }
     setSelectedRange(null);
-  };
-
-  const handleMonthChange = (newMonth: Date) => {
-    setManualMonthChange(true);
-    setMonth(newMonth);
   };
 
   const today = new Date();
@@ -168,7 +158,7 @@ export function CalendarDatePicker({
                 mode="range"
                 defaultMonth={month}
                 month={month}
-                onMonthChange={handleMonthChange}
+                onMonthChange={setMonth}
                 selected={date}
                 onSelect={handleDateSelect}
                 numberOfMonths={2}
