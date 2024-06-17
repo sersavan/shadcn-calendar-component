@@ -217,12 +217,7 @@ export const CalendarDatePicker = React.forwardRef<
             {...props}
             ref={ref}
             id="date"
-            // variant="default"
-            className={cn(
-              // "flex justify-start text-left font-semibold",
-              multiSelectVariants({ variant, className }),
-              !date && "text-muted-foreground"
-            )}
+            className={cn(multiSelectVariants({ variant, className }))}
             onClick={handleTogglePopover}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
