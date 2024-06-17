@@ -236,9 +236,11 @@ export const CalendarDatePicker = React.forwardRef<
                         "bg-accent aria-selected:text-accent-foreground"
                     )}
                     onClick={() => {
-                      selectDateRange(start, end, label);
-                      setMonth(start);
-                      setYear(start.getFullYear());
+                      const startDate = startOfDay(start);
+                      const endDate = endOfDay(end);
+                      selectDateRange(startDate, endDate, label);
+                      setMonth(startDate);
+                      setYear(startDate.getFullYear());
                     }}
                   >
                     {label}
