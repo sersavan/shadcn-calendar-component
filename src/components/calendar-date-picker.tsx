@@ -95,36 +95,11 @@ export const CalendarDatePicker = React.forwardRef<
     const [year, setYear] = React.useState<number | undefined>(
       date?.from?.getFullYear()
     );
-    const [clientDate, setClientDate] = React.useState(new Date());
+
+    const [clientDate, setClientDate] = React.useState<Date>(new Date());
 
     React.useEffect(() => {
-      const today = new Date();
-      setClientDate(today);
-
-      if (
-        date?.from &&
-        format(date.from, "yyyy-MM-dd") !== format(today, "yyyy-MM-dd")
-      ) {
-        const correctedFrom = new Date(
-          today.getFullYear(),
-          today.getMonth(),
-          today.getDate(),
-          date.from.getHours(),
-          date.from.getMinutes(),
-          date.from.getSeconds()
-        );
-        const correctedTo = date.to
-          ? new Date(
-              today.getFullYear(),
-              today.getMonth(),
-              today.getDate(),
-              date.to.getHours(),
-              date.to.getMinutes(),
-              date.to.getSeconds()
-            )
-          : correctedFrom;
-        onDateSelect({ from: correctedFrom, to: correctedTo });
-      }
+      setClientDate(new Date());
     }, []);
 
     const handleClose = () => setIsPopoverOpen(false);
@@ -217,13 +192,14 @@ export const CalendarDatePicker = React.forwardRef<
 
     return (
       <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-        <PopoverTrigger asChild>
+        <PopoverTrigger asChild suppressHydrationWarning>
           <Button
             id="date"
             ref={ref}
             {...props}
             className={cn(multiSelectVariants({ variant, className }))}
             onClick={handleTogglePopover}
+            suppressHydrationWarning
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
             {date?.from ? (
@@ -251,6 +227,7 @@ export const CalendarDatePicker = React.forwardRef<
               maxHeight: "var(--radix-popover-content-available-height)",
               overflowY: "auto",
             }}
+            suppressHydrationWarning
           >
             <div className="flex">
               <div className="flex flex-col gap-1 pr-4 text-left border-r border-foreground/10">
