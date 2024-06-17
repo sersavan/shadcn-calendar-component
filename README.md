@@ -214,9 +214,9 @@ export const CalendarDatePicker = React.forwardRef<
       <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
         <PopoverTrigger asChild>
           <Button
-            {...props}
-            ref={ref}
             id="date"
+            ref={ref}
+            {...props}
             className={cn(multiSelectVariants({ variant, className }))}
             onClick={handleTogglePopover}
           >
