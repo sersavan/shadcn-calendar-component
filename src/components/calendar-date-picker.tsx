@@ -95,6 +95,37 @@ export const CalendarDatePicker = React.forwardRef<
     const [year, setYear] = React.useState<number | undefined>(
       date?.from?.getFullYear()
     );
+    const [clientDate, setClientDate] = React.useState(new Date());
+
+    React.useEffect(() => {
+      const today = new Date();
+      setClientDate(today);
+
+      if (
+        date?.from &&
+        format(date.from, "yyyy-MM-dd") !== format(today, "yyyy-MM-dd")
+      ) {
+        const correctedFrom = new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          today.getDate(),
+          date.from.getHours(),
+          date.from.getMinutes(),
+          date.from.getSeconds()
+        );
+        const correctedTo = date.to
+          ? new Date(
+              today.getFullYear(),
+              today.getMonth(),
+              today.getDate(),
+              date.to.getHours(),
+              date.to.getMinutes(),
+              date.to.getSeconds()
+            )
+          : correctedFrom;
+        onDateSelect({ from: correctedFrom, to: correctedTo });
+      }
+    }, []);
 
     const handleClose = () => setIsPopoverOpen(false);
 
@@ -145,7 +176,7 @@ export const CalendarDatePicker = React.forwardRef<
       }
     };
 
-    const today = new Date();
+    const today = clientDate;
 
     const years = Array.from(
       { length: 11 },
