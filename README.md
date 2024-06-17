@@ -18,7 +18,7 @@ Install the necessary dependencies:
 ```bash
 npm install date-fns react-day-picker
 npx shadcn-ui@latest init
-npx shadcn-ui@latest add button calendar popover
+npx shadcn-ui@latest add button calendar popover select
 ```
 
 ### Step 2: Create the Calendar Date Picker Component
