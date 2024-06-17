@@ -294,7 +294,7 @@ export const CalendarDatePicker = React.forwardRef<
                     onSelect={handleDateSelect}
                     numberOfMonths={2}
                     showOutsideDays={false}
-                    className={cn("w-full", className)}
+                    className={className}
                   />
                 </div>
               </div>
