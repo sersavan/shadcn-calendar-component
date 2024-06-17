@@ -194,6 +194,7 @@ export const CalendarDatePicker = React.forwardRef<
             {...props}
             className={cn(multiSelectVariants({ variant, className }))}
             onClick={handleTogglePopover}
+            suppressHydrationWarning
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
             {date?.from ? (
