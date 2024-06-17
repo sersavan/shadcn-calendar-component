@@ -4,11 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "sonner";
-import Link from "next/link";
 
-import { cn } from "@/lib/utils";
-import { Icons } from "@/components/icons";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
   Form,
@@ -20,7 +17,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import {
-  PageActions,
   PageHeader,
   PageHeaderDescription,
   PageHeaderHeading,
@@ -52,21 +48,10 @@ export default function Home() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-start px-4">
-      <PageHeader>
+    <main className="flex min-h-screen:calc(100vh - 4rem) flex-col items-center justify-start">
+      <PageHeader className="w-full p-4">
         <PageHeaderHeading>Calendar date picker component</PageHeaderHeading>
         <PageHeaderDescription>assembled with shadcn/ui</PageHeaderDescription>
-        <PageActions>
-          <Link
-            target="_blank"
-            rel="noreferrer"
-            href="https://github.com/sersavan/shadcn-calendar-component"
-            className={cn(buttonVariants({ variant: "outline" }))}
-          >
-            <Icons.gitHub className="mr-2 h-4 w-4" />
-            GitHub
-          </Link>
-        </PageActions>
       </PageHeader>
       <Card className="w-full max-w-xl p-4">
         <Form {...form}>
@@ -83,6 +68,7 @@ export default function Home() {
                       onDateSelect={({ from, to }) => {
                         form.setValue("calendar", { from, to });
                       }}
+                      variant="outline"
                     />
                   </FormControl>
                   <FormDescription>

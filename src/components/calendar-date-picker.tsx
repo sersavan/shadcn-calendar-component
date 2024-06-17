@@ -15,6 +15,7 @@ import {
   endOfDay,
 } from "date-fns";
 import { DateRange } from "react-day-picker";
+import { cva, VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -82,197 +83,232 @@ const dateRanges = [
   },
 ];
 
-export function CalendarDatePicker({
-  className,
-  date,
-  closeOnSelect = false,
-  onDateSelect,
-}: React.HTMLAttributes<HTMLDivElement> & {
+const multiSelectVariants = cva(
+  "flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium text-forground ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline:
+          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground text-background",
+        link: "text-primary underline-offset-4 hover:underline text-background",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+);
+
+interface CalendarDatePickerProps
+  extends React.HTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof multiSelectVariants> {
+  className?: string;
   date: DateRange;
   closeOnSelect?: boolean;
   onDateSelect: (range: { from: Date; to: Date }) => void;
-}) {
-  const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
-  const [selectedRange, setSelectedRange] = React.useState<string | null>(
-    "This Year"
-  );
-  const [month, setMonth] = React.useState<Date | undefined>(date?.from);
-  const [year, setYear] = React.useState<number | undefined>(
-    date?.from?.getFullYear()
-  );
-
-  const handleClose = () => setIsPopoverOpen(false);
-
-  const handleTogglePopover = () => setIsPopoverOpen((prev) => !prev);
-
-  const selectDateRange = (from: Date, to: Date, range: string) => {
-    const startDate = startOfDay(from);
-    const endDate = endOfDay(to);
-    onDateSelect({ from: startDate, to: endDate });
-    setSelectedRange(range);
-    setMonth(from);
-    setYear(from.getFullYear());
-    closeOnSelect && setIsPopoverOpen(false);
-  };
-
-  const handleDateSelect = (range: DateRange | undefined) => {
-    if (range) {
-      const from = startOfDay(range.from as Date);
-      const to = range.to ? endOfDay(range.to) : from;
-      onDateSelect({ from, to });
-    }
-    setSelectedRange(null);
-    setMonth(range?.from);
-    setYear(range?.from?.getFullYear());
-  };
-
-  const handleMonthChange = (newMonthIndex: number) => {
-    if (year !== undefined) {
-      const newMonth = new Date(year, newMonthIndex, 1);
-      const from = startOfMonth(newMonth);
-      const to = endOfMonth(newMonth);
-      selectDateRange(from, to, format(newMonth, "LLLL yyyy"));
-    }
-  };
-
-  const handleYearChange = (newYear: number) => {
-    setYear(newYear);
-    if (month) {
-      const newMonth = new Date(newYear, month.getMonth(), 1);
-      const from = startOfMonth(newMonth);
-      const to = endOfMonth(newMonth);
-      selectDateRange(from, to, format(newMonth, "LLLL yyyy"));
-    } else {
-      const newMonth = new Date(newYear, 0, 1);
-      const from = startOfMonth(newMonth);
-      const to = endOfMonth(newMonth);
-      selectDateRange(from, to, format(newMonth, "LLLL yyyy"));
-    }
-  };
-
-  return (
-    <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          id="date"
-          variant="outline"
-          className={cn(
-            "flex justify-start text-left font-normal hover:bg-card",
-            !date && "text-muted-foreground"
-          )}
-          onClick={handleTogglePopover}
-        >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {date?.from ? (
-            date.to ? (
-              <>
-                {format(date.from, "LLL dd, y")} -{" "}
-                {format(date.to, "LLL dd, y")}
-              </>
-            ) : (
-              format(date.from, "LLL dd, y")
-            )
-          ) : (
-            <span>Pick a date</span>
-          )}
-        </Button>
-      </PopoverTrigger>
-      {isPopoverOpen && (
-        <PopoverContent
-          className="w-auto"
-          align="start"
-          avoidCollisions={false}
-          onInteractOutside={handleClose}
-          onEscapeKeyDown={handleClose}
-          style={{
-            maxHeight: "var(--radix-popover-content-available-height)",
-            overflowY: "auto",
-          }}
-        >
-          <div className="flex">
-            <div className="flex flex-col gap-1 pr-4 text-left border-r border-foreground/10">
-              {dateRanges.map(({ label, start, end }) => (
-                <Button
-                  key={label}
-                  variant="ghost"
-                  size="sm"
-                  className={cn(
-                    "justify-start",
-                    selectedRange === label &&
-                      "bg-accent aria-selected:text-accent-foreground"
-                  )}
-                  onClick={() => {
-                    selectDateRange(start, end, label);
-                    setMonth(start);
-                    setYear(start.getFullYear());
-                  }}
-                >
-                  {label}
-                </Button>
-              ))}
-            </div>
-            <div className="flex flex-col">
-              <div className="flex justify-between items-center ml-4">
-                <div className="flex gap-2 w-[250px]">
-                  <Select
-                    onValueChange={(value) =>
-                      handleMonthChange(months.indexOf(value))
-                    }
-                    value={month ? months[month.getMonth()] : undefined}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Month" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {months.map((month, idx) => (
-                        <SelectItem key={idx} value={month}>
-                          {month}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Select
-                    onValueChange={(value) => handleYearChange(Number(value))}
-                    value={year ? year.toString() : undefined}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Year" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {years.map((year, idx) => (
-                        <SelectItem key={idx} value={year.toString()}>
-                          {year}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="block"
-                  onClick={handleClose}
-                >
-                  Close
-                </Button>
-              </div>
-              <div className="flex">
-                <Calendar
-                  mode="range"
-                  defaultMonth={month}
-                  month={month}
-                  onMonthChange={setMonth}
-                  selected={date}
-                  onSelect={handleDateSelect}
-                  numberOfMonths={2}
-                  showOutsideDays={false}
-                  className={cn("w-full", className)}
-                />
-              </div>
-            </div>
-          </div>
-        </PopoverContent>
-      )}
-    </Popover>
-  );
 }
+
+export const CalendarDatePicker = React.forwardRef<
+  HTMLButtonElement,
+  CalendarDatePickerProps
+>(
+  (
+    { className, date, closeOnSelect = false, onDateSelect, variant, ...props },
+    ref
+  ) => {
+    const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
+    const [selectedRange, setSelectedRange] = React.useState<string | null>(
+      "This Year"
+    );
+    const [month, setMonth] = React.useState<Date | undefined>(date?.from);
+    const [year, setYear] = React.useState<number | undefined>(
+      date?.from?.getFullYear()
+    );
+
+    const handleClose = () => setIsPopoverOpen(false);
+
+    const handleTogglePopover = () => setIsPopoverOpen((prev) => !prev);
+
+    const selectDateRange = (from: Date, to: Date, range: string) => {
+      const startDate = startOfDay(from);
+      const endDate = endOfDay(to);
+      onDateSelect({ from: startDate, to: endDate });
+      setSelectedRange(range);
+      setMonth(from);
+      setYear(from.getFullYear());
+      closeOnSelect && setIsPopoverOpen(false);
+    };
+
+    const handleDateSelect = (range: DateRange | undefined) => {
+      if (range) {
+        const from = startOfDay(range.from as Date);
+        const to = range.to ? endOfDay(range.to) : from;
+        onDateSelect({ from, to });
+      }
+      setSelectedRange(null);
+      setMonth(range?.from);
+      setYear(range?.from?.getFullYear());
+    };
+
+    const handleMonthChange = (newMonthIndex: number) => {
+      if (year !== undefined) {
+        const newMonth = new Date(year, newMonthIndex, 1);
+        const from = startOfMonth(newMonth);
+        const to = endOfMonth(newMonth);
+        selectDateRange(from, to, format(newMonth, "LLLL yyyy"));
+      }
+    };
+
+    const handleYearChange = (newYear: number) => {
+      setYear(newYear);
+      if (month) {
+        const newMonth = new Date(newYear, month.getMonth(), 1);
+        const from = startOfMonth(newMonth);
+        const to = endOfMonth(newMonth);
+        selectDateRange(from, to, format(newMonth, "LLLL yyyy"));
+      } else {
+        const newMonth = new Date(newYear, 0, 1);
+        const from = startOfMonth(newMonth);
+        const to = endOfMonth(newMonth);
+        selectDateRange(from, to, format(newMonth, "LLLL yyyy"));
+      }
+    };
+
+    return (
+      <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            {...props}
+            ref={ref}
+            id="date"
+            // variant="default"
+            className={cn(
+              // "flex justify-start text-left font-semibold",
+              multiSelectVariants({ variant, className }),
+              !date && "text-muted-foreground"
+            )}
+            onClick={handleTogglePopover}
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {date?.from ? (
+              date.to ? (
+                <>
+                  {format(date.from, "LLL dd, y")} -{" "}
+                  {format(date.to, "LLL dd, y")}
+                </>
+              ) : (
+                format(date.from, "LLL dd, y")
+              )
+            ) : (
+              <span>Pick a date</span>
+            )}
+          </Button>
+        </PopoverTrigger>
+        {isPopoverOpen && (
+          <PopoverContent
+            className="w-auto"
+            align="start"
+            avoidCollisions={false}
+            onInteractOutside={handleClose}
+            onEscapeKeyDown={handleClose}
+            style={{
+              maxHeight: "var(--radix-popover-content-available-height)",
+              overflowY: "auto",
+            }}
+          >
+            <div className="flex">
+              <div className="flex flex-col gap-1 pr-4 text-left border-r border-foreground/10">
+                {dateRanges.map(({ label, start, end }) => (
+                  <Button
+                    key={label}
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "justify-start",
+                      selectedRange === label &&
+                        "bg-accent aria-selected:text-accent-foreground"
+                    )}
+                    onClick={() => {
+                      selectDateRange(start, end, label);
+                      setMonth(start);
+                      setYear(start.getFullYear());
+                    }}
+                  >
+                    {label}
+                  </Button>
+                ))}
+              </div>
+              <div className="flex flex-col">
+                <div className="flex justify-between items-center ml-4">
+                  <div className="flex gap-2 w-[250px]">
+                    <Select
+                      onValueChange={(value) =>
+                        handleMonthChange(months.indexOf(value))
+                      }
+                      value={month ? months[month.getMonth()] : undefined}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Month" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {months.map((month, idx) => (
+                          <SelectItem key={idx} value={month}>
+                            {month}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select
+                      onValueChange={(value) => handleYearChange(Number(value))}
+                      value={year ? year.toString() : undefined}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Year" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {years.map((year, idx) => (
+                          <SelectItem key={idx} value={year.toString()}>
+                            {year}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="hidden sm:block"
+                    onClick={handleClose}
+                  >
+                    Close
+                  </Button>
+                </div>
+                <div className="flex">
+                  <Calendar
+                    mode="range"
+                    defaultMonth={month}
+                    month={month}
+                    onMonthChange={setMonth}
+                    selected={date}
+                    onSelect={handleDateSelect}
+                    numberOfMonths={2}
+                    showOutsideDays={false}
+                    className={cn("w-full", className)}
+                  />
+                </div>
+              </div>
+            </div>
+          </PopoverContent>
+        )}
+      </Popover>
+    );
+  }
+);
+
+CalendarDatePicker.displayName = "CalendarDatePicker";
