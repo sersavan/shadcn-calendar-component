@@ -24,6 +24,35 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+const today = new Date();
+
+const years = Array.from(
+  { length: 21 },
+  (_, i) => today.getFullYear() - 10 + i
+);
 
 export function CalendarDatePicker({
   className,
@@ -40,6 +69,9 @@ export function CalendarDatePicker({
     "This Year"
   );
   const [month, setMonth] = React.useState<Date | undefined>(date?.from);
+  const [year, setYear] = React.useState<number | undefined>(
+    date?.from?.getFullYear()
+  );
 
   const handleClose = () => setIsPopoverOpen(false);
   const handleTogglePopover = () => setIsPopoverOpen((prev) => !prev);
@@ -50,6 +82,7 @@ export function CalendarDatePicker({
     onDateSelect({ from: startDate, to: endDate });
     setSelectedRange(range);
     setMonth(from);
+    setYear(from.getFullYear());
     closeOnSelect && setIsPopoverOpen(false);
   };
 
@@ -60,9 +93,33 @@ export function CalendarDatePicker({
       onDateSelect({ from, to });
     }
     setSelectedRange(null);
+    setMonth(range?.from);
+    setYear(range?.from?.getFullYear());
   };
 
-  const today = new Date();
+  const handleMonthChange = (newMonthIndex: number) => {
+    if (year !== undefined) {
+      const newMonth = new Date(year, newMonthIndex, 1);
+      const from = startOfMonth(newMonth);
+      const to = endOfMonth(newMonth);
+      selectDateRange(from, to, format(newMonth, "LLLL yyyy"));
+    }
+  };
+
+  const handleYearChange = (newYear: number) => {
+    setYear(newYear);
+    if (month) {
+      const newMonth = new Date(newYear, month.getMonth(), 1);
+      const from = startOfMonth(newMonth);
+      const to = endOfMonth(newMonth);
+      selectDateRange(from, to, format(newMonth, "LLLL yyyy"));
+    } else {
+      const newMonth = new Date(newYear, 0, 1);
+      const from = startOfMonth(newMonth);
+      const to = endOfMonth(newMonth);
+      selectDateRange(from, to, format(newMonth, "LLLL yyyy"));
+    }
+  };
 
   const dateRanges = [
     { label: "Today", start: today, end: today },
@@ -123,48 +180,94 @@ export function CalendarDatePicker({
         <PopoverContent
           className="w-auto"
           align="start"
+          avoidCollisions={false}
           onInteractOutside={handleClose}
           onEscapeKeyDown={handleClose}
+          style={{
+            maxHeight: "var(--radix-popover-content-available-height)",
+            overflowY: "auto",
+          }}
         >
-          <div className="relative">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="block sm:absolute right-0 bottom-0 z-10 border border-foreground/10"
-              onClick={handleClose}
-            >
-              Close
-            </Button>
-            <div className="flex">
-              <div className="flex flex-col gap-1 pr-3 text-left border-r border-foreground/10">
-                {dateRanges.map(({ label, start, end }) => (
-                  <Button
-                    key={label}
-                    variant="ghost"
-                    size="sm"
-                    className={cn(
-                      "justify-start",
-                      selectedRange === label &&
-                        "bg-accent aria-selected:text-accent-foreground"
-                    )}
-                    onClick={() => selectDateRange(start, end, label)}
+          <div className="flex">
+            <div className="flex flex-col gap-1 pr-4 text-left border-r border-foreground/10">
+              {dateRanges.map(({ label, start, end }) => (
+                <Button
+                  key={label}
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "justify-start",
+                    selectedRange === label &&
+                      "bg-accent aria-selected:text-accent-foreground"
+                  )}
+                  onClick={() => {
+                    selectDateRange(start, end, label);
+                    setMonth(start);
+                    setYear(start.getFullYear());
+                  }}
+                >
+                  {label}
+                </Button>
+              ))}
+            </div>
+            <div className="flex flex-col">
+              <div className="flex justify-between items-center ml-4">
+                <div className="flex gap-2 w-[250px]">
+                  <Select
+                    onValueChange={(value) =>
+                      handleMonthChange(months.indexOf(value))
+                    }
+                    value={month ? months[month.getMonth()] : undefined}
                   >
-                    {label}
-                  </Button>
-                ))}
+                    <SelectTrigger>
+                      <SelectValue placeholder="Month" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {months.map((month, idx) => (
+                        <SelectItem key={idx} value={month}>
+                          {month}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select
+                    onValueChange={(value) => handleYearChange(Number(value))}
+                    value={year ? year.toString() : undefined}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Year" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {years.map((year, idx) => (
+                        <SelectItem key={idx} value={year.toString()}>
+                          {year}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="block"
+                  onClick={handleClose}
+                >
+                  Close
+                </Button>
               </div>
-              <Calendar
-                initialFocus
-                mode="range"
-                defaultMonth={month}
-                month={month}
-                onMonthChange={setMonth}
-                selected={date}
-                onSelect={handleDateSelect}
-                numberOfMonths={2}
-                showOutsideDays={false}
-                className={className}
-              />
+              <div className="flex">
+                <Calendar
+                  mode="range"
+                  defaultMonth={month}
+                  month={month}
+                  onMonthChange={setMonth}
+                  selected={date}
+                  onSelect={handleDateSelect}
+                  numberOfMonths={2}
+                  showOutsideDays={false}
+                  className={cn("w-full", className)}
+                />
+              </div>
             </div>
           </div>
         </PopoverContent>
