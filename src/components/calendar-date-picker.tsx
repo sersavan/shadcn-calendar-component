@@ -96,12 +96,6 @@ export const CalendarDatePicker = React.forwardRef<
       date?.from?.getFullYear()
     );
 
-    const [clientDate, setClientDate] = React.useState<Date>(new Date());
-
-    React.useEffect(() => {
-      setClientDate(new Date());
-    }, []);
-
     const handleClose = () => setIsPopoverOpen(false);
 
     const handleTogglePopover = () => setIsPopoverOpen((prev) => !prev);
@@ -146,7 +140,7 @@ export const CalendarDatePicker = React.forwardRef<
       selectDateRange(from, to, format(newMonth, "LLLL yyyy"));
     };
 
-    const today = clientDate;
+    const today = new Date();
 
     const years = Array.from(
       { length: 11 },
@@ -236,11 +230,9 @@ export const CalendarDatePicker = React.forwardRef<
                         "bg-accent aria-selected:text-accent-foreground"
                     )}
                     onClick={() => {
-                      const startDate = startOfDay(start);
-                      const endDate = endOfDay(end);
-                      selectDateRange(startDate, endDate, label);
-                      setMonth(startDate);
-                      setYear(startDate.getFullYear());
+                      selectDateRange(start, end, label);
+                      setMonth(start);
+                      setYear(start.getFullYear());
                     }}
                   >
                     {label}
