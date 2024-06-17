@@ -138,17 +138,12 @@ export const CalendarDatePicker = React.forwardRef<
 
     const handleYearChange = (newYear: number) => {
       setYear(newYear);
-      if (month) {
-        const newMonth = new Date(newYear, month.getMonth(), 1);
-        const from = startOfMonth(newMonth);
-        const to = endOfMonth(newMonth);
-        selectDateRange(from, to, format(newMonth, "LLLL yyyy"));
-      } else {
-        const newMonth = new Date(newYear, 0, 1);
-        const from = startOfMonth(newMonth);
-        const to = endOfMonth(newMonth);
-        selectDateRange(from, to, format(newMonth, "LLLL yyyy"));
-      }
+      const newMonth = month
+        ? new Date(newYear, month.getMonth(), 1)
+        : new Date(newYear, 0, 1);
+      const from = startOfMonth(newMonth);
+      const to = endOfMonth(newMonth);
+      selectDateRange(from, to, format(newMonth, "LLLL yyyy"));
     };
 
     const today = clientDate;
@@ -192,14 +187,13 @@ export const CalendarDatePicker = React.forwardRef<
 
     return (
       <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-        <PopoverTrigger asChild suppressHydrationWarning>
+        <PopoverTrigger asChild>
           <Button
             id="date"
             ref={ref}
             {...props}
             className={cn(multiSelectVariants({ variant, className }))}
             onClick={handleTogglePopover}
-            suppressHydrationWarning
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
             {date?.from ? (
@@ -227,7 +221,6 @@ export const CalendarDatePicker = React.forwardRef<
               maxHeight: "var(--radix-popover-content-available-height)",
               overflowY: "auto",
             }}
-            suppressHydrationWarning
           >
             <div className="flex">
               <div className="flex flex-col gap-1 pr-4 text-left border-r border-foreground/10">
