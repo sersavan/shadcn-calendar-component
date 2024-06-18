@@ -186,7 +186,10 @@ export const CalendarDatePicker = React.forwardRef<
             id="date"
             ref={ref}
             {...props}
-            className={cn(multiSelectVariants({ variant, className }))}
+            className={cn(
+              "w-[250px] text-left",
+              multiSelectVariants({ variant, className })
+            )}
             onClick={handleTogglePopover}
             suppressHydrationWarning
           >
@@ -225,9 +228,9 @@ export const CalendarDatePicker = React.forwardRef<
                     variant="ghost"
                     size="sm"
                     className={cn(
-                      "justify-start",
+                      "justify-start hover:bg-primary/90 hover:text-background",
                       selectedRange === label &&
-                        "bg-accent aria-selected:text-accent-foreground"
+                        "bg-primary text-background hover:bg-primary/90 hover:text-background"
                     )}
                     onClick={() => {
                       selectDateRange(start, end, label);
@@ -248,7 +251,7 @@ export const CalendarDatePicker = React.forwardRef<
                       }
                       value={month ? months[month.getMonth()] : undefined}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="w-[250px] focus:ring-0 focus:ring-offset-0">
                         <SelectValue placeholder="Month" />
                       </SelectTrigger>
                       <SelectContent>
@@ -263,7 +266,7 @@ export const CalendarDatePicker = React.forwardRef<
                       onValueChange={(value) => handleYearChange(Number(value))}
                       value={year ? year.toString() : undefined}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="w-[250px] focus:ring-0 focus:ring-offset-0">
                         <SelectValue placeholder="Year" />
                       </SelectTrigger>
                       <SelectContent>
