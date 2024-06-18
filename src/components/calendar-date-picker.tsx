@@ -251,7 +251,7 @@ export const CalendarDatePicker = React.forwardRef<
                       }
                       value={month ? months[month.getMonth()] : undefined}
                     >
-                      <SelectTrigger className="w-[250px] focus:ring-0 focus:ring-offset-0">
+                      <SelectTrigger className="w-[250px] focus:ring-0 focus:ring-offset-0 font-medium hover:bg-accent hover:text-accent-foreground">
                         <SelectValue placeholder="Month" />
                       </SelectTrigger>
                       <SelectContent>
@@ -266,7 +266,7 @@ export const CalendarDatePicker = React.forwardRef<
                       onValueChange={(value) => handleYearChange(Number(value))}
                       value={year ? year.toString() : undefined}
                     >
-                      <SelectTrigger className="w-[250px] focus:ring-0 focus:ring-offset-0">
+                      <SelectTrigger className="w-[250px] focus:ring-0 focus:ring-offset-0 font-medium hover:bg-accent hover:text-accent-foreground">
                         <SelectValue placeholder="Year" />
                       </SelectTrigger>
                       <SelectContent>
