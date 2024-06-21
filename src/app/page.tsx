@@ -65,7 +65,7 @@ export default function Home() {
       <Card className="w-full max-w-xl p-4">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="flex items-center justify-between gap-8">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
               <FormField
                 control={form.control}
                 name="calendar"
@@ -78,7 +78,7 @@ export default function Home() {
                         onDateSelect={({ from, to }) => {
                           form.setValue("calendar", { from, to });
                         }}
-                        variant="outline"
+                        variant="ghost"
                       />
                     </FormControl>
                     <FormDescription>
@@ -100,7 +100,7 @@ export default function Home() {
                         onDateSelect={({ from, to }) => {
                           form.setValue("datePicker", { from, to });
                         }}
-                        variant="outline"
+                        variant="ghost"
                         numberOfMonths={1}
                       />
                     </FormControl>
