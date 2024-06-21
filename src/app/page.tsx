@@ -28,6 +28,10 @@ const FormSchema = z.object({
     from: z.date(),
     to: z.date(),
   }),
+  datePicker: z.object({
+    from: z.date(),
+    to: z.date(),
+  }),
 });
 
 export default function Home() {
@@ -38,12 +42,17 @@ export default function Home() {
         from: new Date(new Date().getFullYear(), 0, 1),
         to: new Date(),
       },
+      datePicker: {
+        from: new Date(),
+        to: new Date(),
+      },
     },
   });
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     toast(
-      `You have selected a date range: ${data.calendar.from.toDateString()} - ${data.calendar.to.toDateString()}`
+      `1. Date range: ${data.calendar.from.toDateString()} - ${data.calendar.to.toDateString()}
+      2. Single date: ${data.datePicker.from.toDateString()}`
     );
   };
 
@@ -56,28 +65,53 @@ export default function Home() {
       <Card className="w-full max-w-xl p-4">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="calendar"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Calendar</FormLabel>
-                  <FormControl>
-                    <CalendarDatePicker
-                      date={field.value}
-                      onDateSelect={({ from, to }) => {
-                        form.setValue("calendar", { from, to });
-                      }}
-                      variant="outline"
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Select a date range from the calendar above
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="flex items-center justify-between gap-8">
+              <FormField
+                control={form.control}
+                name="calendar"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>1. Date Range</FormLabel>
+                    <FormControl>
+                      <CalendarDatePicker
+                        date={field.value}
+                        onDateSelect={({ from, to }) => {
+                          form.setValue("calendar", { from, to });
+                        }}
+                        variant="outline"
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Select a date range from the calendar
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="datePicker"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>2. Single Date</FormLabel>
+                    <FormControl>
+                      <CalendarDatePicker
+                        date={field.value}
+                        onDateSelect={({ from, to }) => {
+                          form.setValue("datePicker", { from, to });
+                        }}
+                        variant="outline"
+                        numberOfMonths={1}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Select a date from the date picker
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <Button variant="outline" type="submit">
               Submit
             </Button>
