@@ -58,7 +58,7 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen:calc(100vh - 4rem) flex-col items-center justify-start">
-      <PageHeader className="w-full p-4">
+      <PageHeader className="w-full p-4 xl:p-8 2xl:p-12">
         <PageHeaderHeading>Calendar date picker component</PageHeaderHeading>
         <PageHeaderDescription>assembled with shadcn/ui</PageHeaderDescription>
       </PageHeader>
