@@ -163,7 +163,7 @@ export const CalendarDatePicker = React.forwardRef<
       setSelectedRange(null);
       if (part === "from") {
         if (yearFrom !== undefined) {
-          if (newMonthIndex < 0 || newMonthIndex > 11) return;
+          if (newMonthIndex < 0 || newMonthIndex > yearsRange + 1) return;
           const newMonth = new Date(yearFrom, newMonthIndex, 1);
           const from =
             numberOfMonths === 2
@@ -189,7 +189,7 @@ export const CalendarDatePicker = React.forwardRef<
         }
       } else {
         if (yearTo !== undefined) {
-          if (newMonthIndex < 0 || newMonthIndex > 11) return;
+          if (newMonthIndex < 0 || newMonthIndex > yearsRange + 1) return;
           const newMonth = new Date(yearTo, newMonthIndex, 1);
           const from = date.from
             ? startOfDay(toDate(date.from, { timeZone }))
