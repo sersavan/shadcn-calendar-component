@@ -52,7 +52,7 @@ export default function Home() {
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     toast(
       `1. Date range: ${data.calendar.from.toDateString()} - ${data.calendar.to.toDateString()}
-      2. Single date: ${data.datePicker.from.toDateString()}`
+      \n2. Single date: ${data.datePicker.from.toDateString()}`
     );
   };
 
@@ -102,6 +102,7 @@ export default function Home() {
                         }}
                         variant="ghost"
                         numberOfMonths={1}
+                        className="w-[250px]"
                       />
                     </FormControl>
                     <FormDescription>

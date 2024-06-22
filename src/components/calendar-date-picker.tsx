@@ -14,6 +14,7 @@ import {
   startOfDay,
   endOfDay,
 } from "date-fns";
+import { toDate, formatInTimeZone } from "date-fns-tz";
 import { DateRange } from "react-day-picker";
 import { cva, VariantProps } from "class-variance-authority";
 
@@ -78,6 +79,7 @@ interface CalendarDatePickerProps
   date: DateRange;
   closeOnSelect?: boolean;
   numberOfMonths?: 1 | 2;
+  yearsRange?: number;
   onDateSelect: (range: { from: Date; to: Date }) => void;
 }
 
@@ -92,6 +94,7 @@ export const CalendarDatePicker = React.forwardRef<
       date,
       closeOnSelect = false,
       numberOfMonths = 2,
+      yearsRange = 10,
       onDateSelect,
       variant,
       ...props
@@ -118,13 +121,18 @@ export const CalendarDatePicker = React.forwardRef<
       null
     );
 
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    console.log("timezone", timeZone);
+
     const handleClose = () => setIsPopoverOpen(false);
 
     const handleTogglePopover = () => setIsPopoverOpen((prev) => !prev);
 
     const selectDateRange = (from: Date, to: Date, range: string) => {
-      const startDate = startOfDay(from);
-      const endDate = numberOfMonths === 2 ? endOfDay(to) : startDate;
+      const startDate = startOfDay(toDate(from, { timeZone }));
+      const endDate =
+        numberOfMonths === 2 ? endOfDay(toDate(to, { timeZone })) : startDate;
       onDateSelect({ from: startDate, to: endDate });
       setSelectedRange(range);
       setMonthFrom(from);
@@ -136,17 +144,13 @@ export const CalendarDatePicker = React.forwardRef<
 
     const handleDateSelect = (range: DateRange | undefined) => {
       if (range) {
-        let from, to;
-        if (numberOfMonths === 2) {
-          from = startOfDay(range.from as Date);
-          to = range.to ? endOfDay(range.to) : from;
-        } else {
+        let from = startOfDay(toDate(range.from as Date, { timeZone }));
+        let to = range.to ? endOfDay(toDate(range.to, { timeZone })) : from;
+        if (numberOfMonths === 1) {
           if (range.from !== date.from) {
-            from = startOfDay(range.from as Date);
-            to = startOfDay(range.from as Date);
+            to = from;
           } else {
-            from = startOfDay(range.to as Date);
-            to = range.to ? endOfDay(range.to) : from;
+            from = startOfDay(toDate(range.to as Date, { timeZone }));
           }
         }
         onDateSelect({ from, to });
@@ -166,7 +170,7 @@ export const CalendarDatePicker = React.forwardRef<
           const newMonth = new Date(yearFrom, newMonthIndex, 1);
           const from =
             numberOfMonths === 2
-              ? startOfMonth(newMonth)
+              ? startOfMonth(toDate(newMonth, { timeZone }))
               : date?.from
               ? new Date(
                   date.from.getFullYear(),
@@ -177,8 +181,8 @@ export const CalendarDatePicker = React.forwardRef<
           const to =
             numberOfMonths === 2
               ? date.to
-                ? endOfDay(date.to)
-                : endOfMonth(newMonth)
+                ? endOfDay(toDate(date.to, { timeZone }))
+                : endOfMonth(toDate(newMonth, { timeZone }))
               : from;
           if (from <= to) {
             onDateSelect({ from, to });
@@ -191,9 +195,12 @@ export const CalendarDatePicker = React.forwardRef<
           if (newMonthIndex < 0 || newMonthIndex > 11) return;
           const newMonth = new Date(yearTo, newMonthIndex, 1);
           const from = date.from
-            ? startOfDay(date.from)
-            : startOfMonth(newMonth);
-          const to = numberOfMonths === 2 ? endOfMonth(newMonth) : from;
+            ? startOfDay(toDate(date.from, { timeZone }))
+            : startOfMonth(toDate(newMonth, { timeZone }));
+          const to =
+            numberOfMonths === 2
+              ? endOfMonth(toDate(newMonth, { timeZone }))
+              : from;
           if (from <= to) {
             onDateSelect({ from, to });
             setMonthTo(newMonth);
@@ -212,15 +219,15 @@ export const CalendarDatePicker = React.forwardRef<
             : new Date(newYear, 0, 1);
           const from =
             numberOfMonths === 2
-              ? startOfMonth(newMonth)
+              ? startOfMonth(toDate(newMonth, { timeZone }))
               : date.from
               ? new Date(newYear, newMonth.getMonth(), date.from.getDate())
               : newMonth;
           const to =
             numberOfMonths === 2
               ? date.to
-                ? endOfDay(date.to)
-                : endOfMonth(newMonth)
+                ? endOfDay(toDate(date.to, { timeZone }))
+                : endOfMonth(toDate(newMonth, { timeZone }))
               : from;
           if (from <= to) {
             onDateSelect({ from, to });
@@ -236,9 +243,12 @@ export const CalendarDatePicker = React.forwardRef<
             ? new Date(newYear, monthTo.getMonth(), 1)
             : new Date(newYear, 0, 1);
           const from = date.from
-            ? startOfDay(date.from)
-            : startOfMonth(newMonth);
-          const to = numberOfMonths === 2 ? endOfMonth(newMonth) : from;
+            ? startOfDay(toDate(date.from, { timeZone }))
+            : startOfMonth(toDate(newMonth, { timeZone }));
+          const to =
+            numberOfMonths === 2
+              ? endOfMonth(toDate(newMonth, { timeZone }))
+              : from;
           if (from <= to) {
             onDateSelect({ from, to });
             setYearTo(newYear);
@@ -253,8 +263,8 @@ export const CalendarDatePicker = React.forwardRef<
     const today = new Date();
 
     const years = Array.from(
-      { length: 11 },
-      (_, i) => today.getFullYear() - 5 + i
+      { length: yearsRange + 1 },
+      (_, i) => today.getFullYear() - yearsRange / 2 + i
     );
 
     const dateRanges = [
@@ -381,6 +391,9 @@ export const CalendarDatePicker = React.forwardRef<
       };
     }, [highlightedPart, date]);
 
+    const formatWithTz = (date: Date, fmt: string) =>
+      formatInTimeZone(date, timeZone, fmt);
+
     return (
       <>
         <style>
@@ -397,7 +410,7 @@ export const CalendarDatePicker = React.forwardRef<
               ref={ref}
               {...props}
               className={cn(
-                "w-auto min-w-[250px]",
+                "w-auto",
                 multiSelectVariants({ variant, className })
               )}
               onClick={handleTogglePopover}
@@ -418,7 +431,7 @@ export const CalendarDatePicker = React.forwardRef<
                         onMouseOver={() => handleMouseOver("firstDay")}
                         onMouseLeave={handleMouseLeave}
                       >
-                        {format(date.from, "dd")}
+                        {formatWithTz(date.from, "dd")}
                       </span>{" "}
                       <span
                         id={`firstMonth-${id}`}
@@ -430,7 +443,7 @@ export const CalendarDatePicker = React.forwardRef<
                         onMouseOver={() => handleMouseOver("firstMonth")}
                         onMouseLeave={handleMouseLeave}
                       >
-                        {format(date.from, "LLL")}
+                        {formatWithTz(date.from, "LLL")}
                       </span>
                       ,{" "}
                       <span
@@ -443,7 +456,7 @@ export const CalendarDatePicker = React.forwardRef<
                         onMouseOver={() => handleMouseOver("firstYear")}
                         onMouseLeave={handleMouseLeave}
                       >
-                        {format(date.from, "y")}
+                        {formatWithTz(date.from, "y")}
                       </span>
                       {numberOfMonths === 2 && (
                         <>
@@ -458,7 +471,7 @@ export const CalendarDatePicker = React.forwardRef<
                             onMouseOver={() => handleMouseOver("secondDay")}
                             onMouseLeave={handleMouseLeave}
                           >
-                            {format(date.to, "dd")}
+                            {formatWithTz(date.to, "dd")}
                           </span>{" "}
                           <span
                             id={`secondMonth-${id}`}
@@ -470,7 +483,7 @@ export const CalendarDatePicker = React.forwardRef<
                             onMouseOver={() => handleMouseOver("secondMonth")}
                             onMouseLeave={handleMouseLeave}
                           >
-                            {format(date.to, "LLL")}
+                            {formatWithTz(date.to, "LLL")}
                           </span>
                           ,{" "}
                           <span
@@ -483,7 +496,7 @@ export const CalendarDatePicker = React.forwardRef<
                             onMouseOver={() => handleMouseOver("secondYear")}
                             onMouseLeave={handleMouseLeave}
                           >
-                            {format(date.to, "y")}
+                            {formatWithTz(date.to, "y")}
                           </span>
                         </>
                       )}
@@ -499,7 +512,7 @@ export const CalendarDatePicker = React.forwardRef<
                         onMouseOver={() => handleMouseOver("day")}
                         onMouseLeave={handleMouseLeave}
                       >
-                        {format(date.from, "dd")}
+                        {formatWithTz(date.from, "dd")}
                       </span>{" "}
                       <span
                         id="month"
@@ -510,7 +523,7 @@ export const CalendarDatePicker = React.forwardRef<
                         onMouseOver={() => handleMouseOver("month")}
                         onMouseLeave={handleMouseLeave}
                       >
-                        {format(date.from, "LLL")}
+                        {formatWithTz(date.from, "LLL")}
                       </span>
                       ,{" "}
                       <span
@@ -522,7 +535,7 @@ export const CalendarDatePicker = React.forwardRef<
                         onMouseOver={() => handleMouseOver("year")}
                         onMouseLeave={handleMouseLeave}
                       >
-                        {format(date.from, "y")}
+                        {formatWithTz(date.from, "y")}
                       </span>
                     </>
                   )
