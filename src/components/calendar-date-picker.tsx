@@ -3,7 +3,6 @@
 import * as React from "react";
 import { CalendarIcon } from "lucide-react";
 import {
-  format,
   startOfWeek,
   endOfWeek,
   subDays,
@@ -89,7 +88,7 @@ export const CalendarDatePicker = React.forwardRef<
 >(
   (
     {
-      id,
+      id = "calendar-date-picker",
       className,
       date,
       closeOnSelect = false,
@@ -122,8 +121,6 @@ export const CalendarDatePicker = React.forwardRef<
     );
 
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-    console.log("timezone", timeZone);
 
     const handleClose = () => setIsPopoverOpen(false);
 
