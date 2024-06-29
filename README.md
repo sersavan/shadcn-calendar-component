@@ -1,5 +1,3 @@
-#### ⭐ Support this repository by giving it a ⭐
-
 ## Calendar Date Picker Component in Next.js
 
 ### Prerequisites
