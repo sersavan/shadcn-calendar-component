@@ -6,22 +6,24 @@ import { z } from "zod";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  PageHeader,
-  PageHeaderDescription,
-  PageHeaderHeading,
-} from "@/components/page-header";
 import { CalendarDatePicker } from "@/components/calendar-date-picker";
+import { GitHubLogoIcon } from "@radix-ui/react-icons";
+import Link from "next/link";
 
 const FormSchema = z.object({
   calendar: z.object({
@@ -57,67 +59,75 @@ export default function Home() {
   };
 
   return (
-    <main className="flex min-h-screen:calc(100vh - 4rem) flex-col items-center justify-start">
-      <PageHeader className="w-full p-4 2xl:p-12">
-        <PageHeaderHeading>Calendar date picker component</PageHeaderHeading>
-        <PageHeaderDescription>assembled with shadcn/ui</PageHeaderDescription>
-      </PageHeader>
-      <Card className="w-full max-w-xl p-4">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
-              <FormField
-                control={form.control}
-                name="calendar"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>1. Date Range</FormLabel>
-                    <FormControl>
-                      <CalendarDatePicker
-                        date={field.value}
-                        onDateSelect={({ from, to }) => {
-                          form.setValue("calendar", { from, to });
-                        }}
-                        variant="ghost"
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Select a date range from the calendar
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="datePicker"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>2. Single Date</FormLabel>
-                    <FormControl>
-                      <CalendarDatePicker
-                        date={field.value}
-                        onDateSelect={({ from, to }) => {
-                          form.setValue("datePicker", { from, to });
-                        }}
-                        variant="ghost"
-                        numberOfMonths={1}
-                        className="w-[250px]"
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Select a date from the date picker
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <Button variant="outline" type="submit">
-              Submit
-            </Button>
-          </form>
-        </Form>
+    <main className="flex min-h-screen items-start justify-center">
+      <Card className="w-[450px] sm:w-[350px] p-4 m-8">
+        <CardHeader>
+          <CardTitle>Calendar Date Picker</CardTitle>
+          <CardDescription>
+            <span>
+              assembled with shadcn/ui
+              <Link
+                href="https://github.com/sersavan/shadcn-calendar-component"
+                target="_blank"
+              >
+                <Button variant="link" size="sm">
+                  <GitHubLogoIcon className="h-4 w-4" />
+                </Button>
+              </Link>
+            </span>
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <div className="flex flex-col gap-4">
+                <FormField
+                  control={form.control}
+                  name="calendar"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Date Range</FormLabel>
+                      <FormControl className="w-full">
+                        <CalendarDatePicker
+                          date={field.value}
+                          onDateSelect={({ from, to }) => {
+                            form.setValue("calendar", { from, to });
+                          }}
+                          variant="outline"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="datePicker"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Single Date</FormLabel>
+                      <FormControl className="w-full">
+                        <CalendarDatePicker
+                          date={field.value}
+                          onDateSelect={({ from, to }) => {
+                            form.setValue("datePicker", { from, to });
+                          }}
+                          variant="outline"
+                          numberOfMonths={1}
+                          className="min-w-[250px]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <Button variant="default" type="submit" className="w-full">
+                Submit
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
       </Card>
     </main>
   );
