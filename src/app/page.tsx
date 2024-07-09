@@ -60,10 +60,12 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen items-start justify-center">
-      <Card className="w-[450px] sm:w-[350px] p-4 m-8">
+      <Card className="w-[400px] p-4 m-8">
         <CardHeader>
-          <CardTitle>Calendar Date Picker</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-3xl font-semibold">
+            Calendar Date Picker
+          </CardTitle>
+          <CardDescription className="text-md text-muted-foreground">
             <span>
               assembled with shadcn/ui
               <Link
@@ -86,7 +88,9 @@ export default function Home() {
                   name="calendar"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Date Range</FormLabel>
+                      <FormLabel className="text-md font-normal">
+                        Date Range
+                      </FormLabel>
                       <FormControl className="w-full">
                         <CalendarDatePicker
                           date={field.value}
@@ -105,7 +109,9 @@ export default function Home() {
                   name="datePicker"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Single Date</FormLabel>
+                      <FormLabel className="text-md font-normal">
+                        Single Date
+                      </FormLabel>
                       <FormControl className="w-full">
                         <CalendarDatePicker
                           date={field.value}
